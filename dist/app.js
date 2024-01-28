@@ -647,9 +647,9 @@ $(function() {
         height: window.innerHeight,
         allowTouchMove: true,
         // If we need pagination
-        pagination: {
-            el: ".swiper-pagination"
-        },
+        // pagination: {
+        //   el: ".swiper-pagination",
+        // },
         breakpoints: {
             1333: {
                 allowTouchMove: false

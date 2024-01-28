@@ -42,16 +42,16 @@ $(function () {
     loop: false,
     slidesPerView: 1,
     height: window.innerHeight,
-    allowTouchMove: true,
+    allowTouchMove: false,
     // If we need pagination
-    pagination: {
-      el: ".swiper-pagination",
-    },
-    breakpoints: {
-      1333: {
-        allowTouchMove: false,
-      },
-    },
+    // pagination: {
+    //   el: ".swiper-pagination",
+    // },
+    // breakpoints: {
+    //   1333: {
+    //     allowTouchMove: false,
+    //   },
+    // },
   });
 
   // ------------------------------------------------------ Slide navigation helpers
