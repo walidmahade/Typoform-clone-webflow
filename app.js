@@ -11,6 +11,7 @@ $(function () {
   const goNextBtn = $(".swiper-nav.lv-form_next");
   const goPrevBtn = $(".swiper-nav.lv-form_prev");
   let scrolling = false;
+  let conditionUsed = false;
 
   /**
    * Focus on first input
@@ -21,29 +22,59 @@ $(function () {
   $("html, body").animate({ scrollTop: 0 }, 0);
 
   // Function to check if an element is in the viewport
-  $.fn.isInViewport = function () {
-    let elementTop = $(this).offset().top;
-    let elementBottom = elementTop + $(this).outerHeight();
-    let viewportTop = $(window).scrollTop();
-    let viewportBottom = viewportTop + $(window).height();
-    return elementBottom > viewportTop && elementTop < viewportBottom;
-  };
+  // $.fn.isInViewport = function () {
+  //   let elementTop = $(this).offset().top;
+  //   let elementBottom = elementTop + $(this).outerHeight();
+  //   let viewportTop = $(window).scrollTop();
+  //   let viewportBottom = viewportTop + $(window).height();
+  //   return elementBottom > viewportTop && elementTop < viewportBottom;
+  // };
+
+  /**
+   * -------------------------------------------------------------------
+   * swiper slider
+   * for form navigation
+   * with mobile swipe support
+   */
+  const lvFormSlider = new Swiper(".swiper", {
+    // Optional parameters
+    direction: "vertical",
+    loop: false,
+    slidesPerView: 1,
+    height: window.innerHeight,
+    allowTouchMove: true,
+    // If we need pagination
+    pagination: {
+      el: ".swiper-pagination",
+    },
+    breakpoints: {
+      1333: {
+        allowTouchMove: false,
+      },
+    },
+  });
 
   // ------------------------------------------------------ Slide navigation helpers
   function goToSlide(slider, newIndex) {
     slider.slideTo(newIndex);
   }
 
-  // Function to get the previous section
-  function getPrevSlide(currentSection) {
-    const prevSection = $('[data-target="' + currentSection + '"]').prev(".lv-form_field");
-    return prevSection.length ? prevSection.data("target") : currentSection;
+  function goToPrevSlide() {
+    const activeIndex = lvFormSlider.activeIndex;
+    if (activeIndex === 4 && conditionUsed) {
+      lvFormSlider.slideTo(activeIndex - 2);
+    } else lvFormSlider.slidePrev();
   }
 
-  // Function to get the next section
-  function getNextSlide(currentSection) {
-    const nextSection = $('[data-target="' + currentSection + '"]').next(".lv-form_field");
-    return nextSection.length ? nextSection.data("target") : currentSection;
+  function goToNextSlide() {
+    const errors = activeSlideHasErrors();
+    const activeIndex = lvFormSlider.activeIndex;
+
+    if (!errors) {
+      if (activeIndex === 2 && conditionUsed) {
+        lvFormSlider.slideTo(activeIndex + 2);
+      } else lvFormSlider.slideNext();
+    }
   }
 
   // -------------------------------------------------------  validation helpers
@@ -99,28 +130,22 @@ $(function () {
     return false;
   }
 
-  /**
-   * swiper slider
-   * for form navigation
-   * with mobile swipe support
-   */
-  const lvFormSlider = new Swiper(".swiper", {
-    // Optional parameters
-    direction: "vertical",
-    loop: false,
-    slidesPerView: 1,
-    height: window.innerHeight,
-    allowTouchMove: true,
-    // If we need pagination
-    pagination: {
-      el: ".swiper-pagination",
-    },
-    breakpoints: {
-      1333: {
-        allowTouchMove: false,
-      },
-    },
-  });
+  function goToSlideConditionally(conditions, inputVal) {
+    const conditionsObj = {};
+    conditions.split("\n").map((c) => (conditionsObj[c.split("=")[0]] = c.split("=")[1]));
+    const targetSlideSerial = conditionsObj[inputVal];
+
+    if (targetSlideSerial) {
+      // targetSlideSerial starts from 1, slide index starts from 0
+      // to match both need to subtract 1
+      conditionUsed = true;
+      goToSlide(lvFormSlider, Number(targetSlideSerial) - 1);
+    } else {
+      console.log("NO MATCHING CONDITION TARGET FOUND");
+      conditionUsed = false;
+      goToNextSlide();
+    }
+  }
 
   // on slide change actions
   lvFormSlider.on("slideChange", function (event) {
@@ -140,14 +165,14 @@ $(function () {
   goNextBtn.on("click", function (event) {
     console.log("Trying to Go to next page");
     event.preventDefault();
-    const errors = activeSlideHasErrors();
-    if (!errors) lvFormSlider.slideNext();
+    // go next
+    goToNextSlide();
   });
 
   goPrevBtn.on("click", function (event) {
     console.log("Trying Go to previous page");
     event.preventDefault();
-    lvFormSlider.slidePrev();
+    goToPrevSlide();
   });
   // ----------------------------- END swiper code
 
@@ -160,16 +185,16 @@ $(function () {
 
       // Determine scroll direction
       const direction = event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0 ? "up" : "down";
+      const activeIndex = lvFormSlider.activeIndex;
 
       if (direction === "up") {
         // if direction is up, no need to check for errors
-        lvFormSlider.slidePrev();
+        goToPrevSlide();
       } else {
         // if direction is down
         console.log("Running scroll down else block");
-        const errors = activeSlideHasErrors();
-        if (errors) return;
-        lvFormSlider.slideNext();
+        // go next
+        goToNextSlide();
       }
     }
   }
@@ -185,8 +210,8 @@ $(function () {
 
   // handler
   $(".lv-form_ok-btn").on("click", function () {
-    const errors = activeSlideHasErrors();
-    if (!errors) lvFormSlider.slideNext();
+    // go next
+    goToNextSlide();
   });
 
   // on input change remove errors
@@ -223,13 +248,20 @@ $(function () {
     $this.addClass("is-checked");
     $this.siblings(".cta-form_checkbox").removeClass("is-checked");
 
-    const siblingInput = $this.parent(".lv-form_multichoice").siblings(".lv-form_input");
+    const targetInput = $this.parent(".lv-form_multichoice").siblings(".lv-form_input");
 
-    if (siblingInput.length) {
-      console.log("prev selector: ", siblingInput);
-      siblingInput.val($this.find(".cta-form-check-text").first().text());
+    if (targetInput.length) {
+      console.log("prev selector: ", targetInput);
+      targetInput.val($this.find(".cta-form-check-text").first().text());
     } else {
       console.error("input not found");
+    }
+
+    const conditions = targetInput.data("conditions");
+
+    if (conditions) {
+      goToSlideConditionally(conditions, targetInput.val());
+      return;
     }
 
     // animate
