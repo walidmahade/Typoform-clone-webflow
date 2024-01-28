@@ -1,0 +1,213 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        // Set input value to the text of the clicked label
+        $('.cta-form_checkbox').click(function () {
+            let labelText = $(this).find('label').text();
+            $('.cta-form_check-input').val(labelText);
+            console.log(labelText);
+        });
+
+
+        let checkButtonClicked = null;
+
+        $(".cta-form_checkbox").click(function () {
+            if (checkButtonClicked !== null) {
+                checkButtonClicked.find(".cta-form-check").css({
+                    "background-color": "",
+                    "color": ""
+                });
+                checkButtonClicked.find(".cta-form-check-mark").hide();
+            }
+
+            let childButton = $(this).children(".cta-form-check");
+            let checkMark = $(this).children(".cta-form-check-mark");
+
+            childButton.css({
+                "background-color": "white",
+                "color": "#5b26ee"
+            });
+
+            checkMark.show();
+
+            checkButtonClicked = $(this);
+        });
+
+
+        $(".btn-1").click(function () {
+            if ($(".cta-form_input").val().trim() !== "") {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-2").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-2").click(function () {
+            $("html, body").animate(
+                {
+                    scrollTop: $("#cta-form-3").offset().top,
+                },
+                1000
+            );
+
+        });
+
+        $(".btn-3").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-4").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+
+        $(".btn-4").click(function () {
+            if ($(".cta-form_input-4").val().trim() !== "") {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-5").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-5").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-6").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-6").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-7").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+
+        $(".btn-7").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-8").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-8").click(function () {
+            if ($(".cta-form_input-8").val().trim() !== "") {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-9").offset().top,
+                    },
+                    1000
+                );
+            }
+
+
+        });
+
+        $(".btn-9").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-10").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-10").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-11").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-11").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-12").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-12").click(function () {
+            if (checkButtonClicked !== null) {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-13").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+        $(".btn-13").click(function () {
+            $("html, body").animate(
+                {
+                    scrollTop: $("#cta-form-14").offset().top,
+                },
+                1000
+            );
+        });
+        $(".btn-14").click(function () {
+            if ($(".cta-form_input-14").val().trim() !== "") {
+                $("html, body").animate(
+                    {
+                        scrollTop: $("#cta-form-15").offset().top,
+                    },
+                    1000
+                );
+            }
+        });
+
+
+    });
+
+
+</script>
+
+
+<style>
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
+    .w-input, .w-select {
+        border: none;
+        border-bottom: 1px solid;
+        color: white;
+    }
+
+    .w-input:focus, .w-select:focus {
+        box-shadow: rgb(255, 255, 255) 0px 2px;
+        outline: 0;
+        border: none;
+    }
+
+    .check {
+        appearance: none;
+    }
+
+    .right-arrow {
+        color: #fff;
+    }
+</style>
