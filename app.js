@@ -175,7 +175,7 @@ $(function () {
   }
 
   // Attach the handleScroll function to the mousewheel event
-  $(window).bind("mousewheel", handleScroll);
+  $(document).on("mousewheel DOMMouseScroll", handleScroll);
 
   // ------------------------------------------------------------------------ END scroll related code
 
