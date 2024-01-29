@@ -4,7 +4,7 @@ function getLetterFromNumber(num) {
 }
 
 $(function () {
-  console.log("Loading local script -----------");
+  console.log("Loading local script 2.0 -----------");
 
   // DOM elements
   const heroImage = $(".lv-form_hero-image");
@@ -12,6 +12,25 @@ $(function () {
   const goPrevBtn = $(".swiper-nav.lv-form_prev");
   let scrolling = false;
   let conditionUsed = false;
+
+  // ------- update numbers for 7 - 16 questions
+  function increaseByOne() {
+    const startIndex = 7;
+    const endIndex = 16;
+    for (let i = startIndex; i <= endIndex; i++) {
+      const $target = $(`.lv-form_field[data-serial="${i}"]`);
+      $target.find(".cta-form-label-text").text(i + 1);
+    }
+  }
+  function decreaseByOne() {
+    const startIndex = 7;
+    const endIndex = 16;
+    for (let i = startIndex; i <= endIndex; i++) {
+      const $target = $(`.lv-form_field[data-serial="${i}"]`);
+      $target.find(".cta-form-label-text").text(i);
+    }
+  }
+  // ------- END update serial
 
   /**
    * Focus on first input
@@ -21,14 +40,14 @@ $(function () {
   $lvFormFields.first().find("input").focus().select();
   $("html, body").animate({ scrollTop: 0 }, 0);
 
-  // Function to check if an element is in the viewport
-  // $.fn.isInViewport = function () {
-  //   let elementTop = $(this).offset().top;
-  //   let elementBottom = elementTop + $(this).outerHeight();
-  //   let viewportTop = $(window).scrollTop();
-  //   let viewportBottom = viewportTop + $(window).height();
-  //   return elementBottom > viewportTop && elementTop < viewportBottom;
-  // };
+  /**
+   * -------------------------------------------------------------------
+   * Submit button loading animation
+   */
+  const submitBtn = $(".lv-form_btn-submit");
+  submitBtn.on("click", function (event) {
+    submitBtn.text("Sending ...");
+  });
 
   /**
    * -------------------------------------------------------------------
@@ -61,7 +80,7 @@ $(function () {
 
   function goToPrevSlide() {
     const activeIndex = lvFormSlider.activeIndex;
-    if (activeIndex === 4 && conditionUsed) {
+    if (activeIndex === 7 && conditionUsed) {
       lvFormSlider.slideTo(activeIndex - 2);
     } else lvFormSlider.slidePrev();
   }
@@ -69,9 +88,10 @@ $(function () {
   function goToNextSlide() {
     const errors = activeSlideHasErrors();
     const activeIndex = lvFormSlider.activeIndex;
+    console.log("ERRORS: ", errors);
 
     if (!errors) {
-      if (activeIndex === 2 && conditionUsed) {
+      if (activeIndex === 5 && conditionUsed) {
         lvFormSlider.slideTo(activeIndex + 2);
       } else lvFormSlider.slideNext();
     }
@@ -105,20 +125,27 @@ $(function () {
   function activeSlideHasErrors() {
     const activeSlider = $(".lv-form_field.swiper-slide-active");
     const targetInput = activeSlider.find("input");
-
+    // field not found
     if (!targetInput.length) {
       console.warn("Input not found in active slide");
       return true;
     }
 
+    // field is optional
+    if (targetInput.data("required") === false || targetInput.data("required") === "false") {
+      return false;
+    }
+
     const okBtn = activeSlider.find(".lv-form_ok-btn").first();
 
+    // value is empty
     if (targetInput.val() === "" || targetInput.val() === null) {
       console.log("Trigger error: EMPTY_VALUE");
       triggerErrorMessage(okBtn);
       return true;
     }
 
+    // value is email
     if (inputIsEmail(targetInput)) {
       console.log("Trigger error: INVALID_EMAIL");
       if (!isValidEmail(targetInput.val())) {
