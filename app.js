@@ -39,25 +39,6 @@ $(function () {
   const goPrevBtn = $(".swiper-nav.lv-form_prev");
   let scrolling = false;
 
-  // ------- update numbers for 7 - 16 questions
-  function increaseByOne() {
-    const startIndex = 7;
-    const endIndex = 16;
-    for (let i = startIndex; i <= endIndex; i++) {
-      const $target = $(`.lv-form_field[data-serial="${i}"]`);
-      $target.find(".cta-form-label-text").text(i + 1);
-    }
-  }
-  function decreaseByOne() {
-    const startIndex = 7;
-    const endIndex = 16;
-    for (let i = startIndex; i <= endIndex; i++) {
-      const $target = $(`.lv-form_field[data-serial="${i}"]`);
-      $target.find(".cta-form-label-text").text(i);
-    }
-  }
-  // ------- END update serial
-
   /**
    * Focus on first input
    * Scroll to top on page load
@@ -101,9 +82,6 @@ $(function () {
   });
 
   // ------------------------------------------------------ Slide navigation helpers
-  function goToSlide(slider, newIndex) {
-    slider.slideTo(newIndex);
-  }
 
   function goToPrevSlide() {
     lvFormSlider.slidePrev();
@@ -183,10 +161,17 @@ $(function () {
     const newSlideSerial = conditionsObj[inputVal];
 
     if (newSlideSerial) {
-      console.log("Pushing new SLIDE ---------: ", newSlideSerial);
-      lvFormSlider.addSlide(lvFormSlider.activeIndex + 1, $("[data-serial='" + newSlideSerial + "']"));
-      lvFormSlider.update();
-      lvFormSlider.updateSlides();
+      const slideSelector = $(`.lv-custom-form [data-serial="${newSlideSerial}"]`);
+      if (slideSelector.length) {
+        console.log("SLIDE ALREADY EXISTS, NO NEED TO PUSH NEW");
+      } else {
+        console.log("Pushing new SLIDE ---------: ", newSlideSerial);
+        // clone jquery object, because swiper will cut paste the dom element
+        const newSlide = $(`[data-serial='${newSlideSerial}']`).clone();
+        lvFormSlider.addSlide(lvFormSlider.activeIndex + 1, newSlide);
+        lvFormSlider.update();
+        lvFormSlider.updateSlides();
+      }
       goToNextSlide();
     } else {
       console.log("NO MATCHING CONDITION TARGET FOUND, REMOVING EXTRA");
@@ -263,16 +248,18 @@ $(function () {
    */
 
   // handler
-  $(".lv-form_ok-btn").on("click", function () {
+  $(".lv-form_wrapper").on("click", ".lv-form_ok-btn", function () {
     // go next
     goToNextSlide();
   });
 
   // on input change remove errors
-  $(".lv-form_input").on("input", function () {
+  function handleInput(event) {
     scrolling = false;
-    removeErrorMessage($(this));
-  });
+    removeErrorMessage($(event.target));
+  }
+  $(".lv-form_input").on("input", handleInput);
+  $(".lv-form_wrapper").on("input", "input[type='text']", handleInput);
   // ----------------------------------------------------------------- END validation code
 
   /**
