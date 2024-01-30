@@ -617,7 +617,6 @@ $(function() {
     const goNextBtn = $(".swiper-nav.lv-form_next");
     const goPrevBtn = $(".swiper-nav.lv-form_prev");
     let scrolling = false;
-    let conditionUsed = false;
     // ------- update numbers for 7 - 16 questions
     function increaseByOne() {
         const startIndex = 7;
@@ -662,25 +661,19 @@ $(function() {
         loop: false,
         slidesPerView: 1,
         height: window.innerHeight,
-        allowTouchMove: false
+        allowTouchMove: false,
+        observer: true
     });
     // ------------------------------------------------------ Slide navigation helpers
     function goToSlide(slider, newIndex) {
         slider.slideTo(newIndex);
     }
     function goToPrevSlide() {
-        const activeIndex = lvFormSlider.activeIndex;
-        if (activeIndex === 7 && conditionUsed) lvFormSlider.slideTo(activeIndex - 2);
-        else lvFormSlider.slidePrev();
+        lvFormSlider.slidePrev();
     }
     function goToNextSlide() {
         const errors = activeSlideHasErrors();
-        const activeIndex = lvFormSlider.activeIndex;
-        console.log("ERRORS: ", errors);
-        if (!errors) {
-            if (activeIndex === 5 && conditionUsed) lvFormSlider.slideTo(activeIndex + 2);
-            else lvFormSlider.slideNext();
-        }
+        if (!errors) lvFormSlider.slideNext();
     }
     // -------------------------------------------------------  validation helpers
     function inputIsEmail($target) {
@@ -735,23 +728,31 @@ $(function() {
         return false;
     }
     function goToSlideConditionally(conditions, inputVal) {
+        // conditions structure: "yes=8 \n no=9"
         const conditionsObj = {};
         conditions.split("\n").map((c)=>conditionsObj[c.split("=")[0]] = c.split("=")[1]);
-        const targetSlideSerial = conditionsObj[inputVal];
-        if (targetSlideSerial) {
-            // targetSlideSerial starts from 1, slide index starts from 0
-            // to match both need to subtract 1
-            conditionUsed = true;
-            goToSlide(lvFormSlider, Number(targetSlideSerial) - 1);
+        const newSlideSerial = conditionsObj[inputVal];
+        if (newSlideSerial) {
+            console.log("Pushing new SLIDE ---------: ", newSlideSerial);
+            lvFormSlider.addSlide(lvFormSlider.activeIndex + 1, $("[data-serial='" + newSlideSerial + "']"));
+            lvFormSlider.update();
+            lvFormSlider.updateSlides();
+            goToNextSlide();
         } else {
-            console.log("NO MATCHING CONDITION TARGET FOUND");
-            conditionUsed = false;
+            console.log("NO MATCHING CONDITION TARGET FOUND, REMOVING EXTRA");
+            // remove extra slides, if any
+            const extraSlideSerial = Object.values(conditionsObj)[0];
+            // remove dom element with serial of first value
+            $(`.lv-custom-form [data-serial="${extraSlideSerial}"]`).remove();
+            lvFormSlider.update();
+            lvFormSlider.updateSlides();
+            // go next
             goToNextSlide();
         }
     }
     // on slide change actions
     lvFormSlider.on("slideChange", function(event) {
-        // show of hide hero image based on slide
+        // show or hide hero image based on slide
         if (event.activeIndex > 0) heroImage.hide(100);
         else heroImage.show(50);
     });
@@ -833,13 +834,13 @@ $(function() {
             console.log("prev selector: ", targetInput);
             targetInput.val($this.find(".cta-form-check-text").first().text());
         } else console.error("input not found");
-        const conditions = targetInput.data("conditions");
-        if (conditions) {
-            goToSlideConditionally(conditions, targetInput.val());
-            return;
-        }
         // animate
         runFlashAnimation($this);
+        const conditions = targetInput.data("conditions");
+        if (conditions) {
+            setTimeout(()=>goToSlideConditionally(conditions, targetInput.val()), 850);
+            return;
+        }
         // remove error message and show ok button
         removeErrorMessage($(this));
         // go to next slide

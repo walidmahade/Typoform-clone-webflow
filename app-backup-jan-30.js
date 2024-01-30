@@ -31,32 +31,12 @@ function getLetterFromNumber(num) {
 }
 
 $(function () {
-  console.log("Loading local script 2.0 -----------");
-
   // DOM elements
   const heroImage = $(".lv-form_hero-image");
   const goNextBtn = $(".swiper-nav.lv-form_next");
   const goPrevBtn = $(".swiper-nav.lv-form_prev");
   let scrolling = false;
-
-  // ------- update numbers for 7 - 16 questions
-  function increaseByOne() {
-    const startIndex = 7;
-    const endIndex = 16;
-    for (let i = startIndex; i <= endIndex; i++) {
-      const $target = $(`.lv-form_field[data-serial="${i}"]`);
-      $target.find(".cta-form-label-text").text(i + 1);
-    }
-  }
-  function decreaseByOne() {
-    const startIndex = 7;
-    const endIndex = 16;
-    for (let i = startIndex; i <= endIndex; i++) {
-      const $target = $(`.lv-form_field[data-serial="${i}"]`);
-      $target.find(".cta-form-label-text").text(i);
-    }
-  }
-  // ------- END update serial
+  let conditionUsed = false;
 
   /**
    * Focus on first input
@@ -88,7 +68,6 @@ $(function () {
     slidesPerView: 1,
     height: window.innerHeight,
     allowTouchMove: false,
-    observer: true,
     // If we need pagination
     // pagination: {
     //   el: ".swiper-pagination",
@@ -106,13 +85,21 @@ $(function () {
   }
 
   function goToPrevSlide() {
-    lvFormSlider.slidePrev();
+    const activeIndex = lvFormSlider.activeIndex;
+    if (activeIndex === 7 && conditionUsed) {
+      lvFormSlider.slideTo(activeIndex - 2);
+    } else lvFormSlider.slidePrev();
   }
 
   function goToNextSlide() {
     const errors = activeSlideHasErrors();
+    const activeIndex = lvFormSlider.activeIndex;
+    console.log("ERRORS: ", errors);
+
     if (!errors) {
-      lvFormSlider.slideNext();
+      if (activeIndex === 5 && conditionUsed) {
+        lvFormSlider.slideTo(activeIndex + 2);
+      } else lvFormSlider.slideNext();
     }
   }
 
@@ -177,33 +164,25 @@ $(function () {
   }
 
   function goToSlideConditionally(conditions, inputVal) {
-    // conditions structure: "yes=8 \n no=9"
     const conditionsObj = {};
     conditions.split("\n").map((c) => (conditionsObj[c.split("=")[0]] = c.split("=")[1]));
-    const newSlideSerial = conditionsObj[inputVal];
+    const targetSlideSerial = conditionsObj[inputVal];
 
-    if (newSlideSerial) {
-      console.log("Pushing new SLIDE ---------: ", newSlideSerial);
-      lvFormSlider.addSlide(lvFormSlider.activeIndex + 1, $("[data-serial='" + newSlideSerial + "']"));
-      lvFormSlider.update();
-      lvFormSlider.updateSlides();
-      goToNextSlide();
+    if (targetSlideSerial) {
+      // targetSlideSerial starts from 1, slide index starts from 0
+      // to match both need to subtract 1
+      conditionUsed = true;
+      goToSlide(lvFormSlider, Number(targetSlideSerial) - 1);
     } else {
-      console.log("NO MATCHING CONDITION TARGET FOUND, REMOVING EXTRA");
-      // remove extra slides, if any
-      const extraSlideSerial = Object.values(conditionsObj)[0];
-      // remove dom element with serial of first value
-      $(`.lv-custom-form [data-serial="${extraSlideSerial}"]`).remove();
-      lvFormSlider.update();
-      lvFormSlider.updateSlides();
-      // go next
+      console.log("NO MATCHING CONDITION TARGET FOUND");
+      conditionUsed = false;
       goToNextSlide();
     }
   }
 
   // on slide change actions
   lvFormSlider.on("slideChange", function (event) {
-    // show or hide hero image based on slide
+    // show of hide hero image based on slide
     if (event.activeIndex > 0) {
       heroImage.hide(100);
     } else {
@@ -311,15 +290,15 @@ $(function () {
       console.error("input not found");
     }
 
-    // animate
-    runFlashAnimation($this);
-
     const conditions = targetInput.data("conditions");
 
     if (conditions) {
-      setTimeout(() => goToSlideConditionally(conditions, targetInput.val()), 850);
+      goToSlideConditionally(conditions, targetInput.val());
       return;
     }
+
+    // animate
+    runFlashAnimation($this);
 
     // remove error message and show ok button
     removeErrorMessage($(this));
@@ -339,7 +318,9 @@ $(function () {
         optionsArr.map(function (opStr, num) {
           optionsHtml += `
           <div class="cta-form_checkbox">
-            <div class="cta-form-check">${opStr.toLowerCase() === "no" ? "N" : opStr.toLowerCase() === "yes" ? "Y" : getLetterFromNumber(num)}</div>
+            <div class="cta-form-check">${
+              opStr.toLowerCase() === "no" ? "N" : opStr.toLowerCase() === "yes" ? "Y" : getLetterFromNumber(num)
+            }</div>
             <div class="cta-form-check-text">${opStr}</div>
           </div>`;
         });
