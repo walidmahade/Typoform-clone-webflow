@@ -34,29 +34,12 @@ $(function () {
    * with mobile swipe support
    */
   const lvFormSlider = new Swiper(".swiper", {
-    // Optional parameters
     direction: "vertical",
     loop: false,
     slidesPerView: 1,
-    // height: window.innerHeight,
     allowTouchMove: false,
     observer: true,
   });
-
-  /*if ($(window).width() < 600) {
-    $(window).on("resize", function () {
-      let height = $(window).height();
-      let width = $(window).width();
-      $(".swiper-container, .swiper-slide").height(height);
-      $(".swiper-container, .swiper-slide").width(width);
-      //Add reInit, because jQuery's resize event handler may occur earlier than Swiper's one
-      lvFormSlider.update();
-      lvFormSlider.updateSlides();
-    });
-    $(window).resize();
-  }
-  */
-
   // ------------------------------------------------------ Slide navigation helpers
 
   function goToPrevSlide() {
