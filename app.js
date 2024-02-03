@@ -1,38 +1,9 @@
 function getLetterFromNumber(num) {
-  const alphabets = [
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z",
-  ];
+  const alphabets = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
   return alphabets[parseInt(num)];
 }
 
 $(function () {
-  console.log("Loading local script 2.0 -----------");
-
   // DOM elements
   const heroImage = $(".lv-form_hero-image");
   const goNextBtn = $(".swiper-nav.lv-form_next");
@@ -70,16 +41,21 @@ $(function () {
     height: window.innerHeight,
     allowTouchMove: false,
     observer: true,
-    // If we need pagination
-    // pagination: {
-    //   el: ".swiper-pagination",
-    // },
-    // breakpoints: {
-    //   1333: {
-    //     allowTouchMove: false,
-    //   },
-    // },
   });
+
+  /*if ($(window).width() < 600) {
+    $(window).on("resize", function () {
+      let height = $(window).height();
+      let width = $(window).width();
+      $(".swiper-container, .swiper-slide").height(height);
+      $(".swiper-container, .swiper-slide").width(width);
+      //Add reInit, because jQuery's resize event handler may occur earlier than Swiper's one
+      lvFormSlider.update();
+      lvFormSlider.updateSlides();
+    });
+    $(window).resize();
+  }
+  */
 
   // ------------------------------------------------------ Slide navigation helpers
 
@@ -246,7 +222,6 @@ $(function () {
   /**
    * handle button click: go to next section
    */
-
   // handler
   $(".lv-form_wrapper").on("click", ".lv-form_ok-btn", function () {
     // go next
@@ -258,6 +233,7 @@ $(function () {
     scrolling = false;
     removeErrorMessage($(event.target));
   }
+
   $(".lv-form_input").on("input", handleInput);
   $(".lv-form_wrapper").on("input", "input[type='text']", handleInput);
   // ----------------------------------------------------------------- END validation code
@@ -274,6 +250,7 @@ $(function () {
       $(this).fadeIn(150);
     });
   }
+
   function runFlashAnimation($target) {
     // Trigger the flash animation three times with a delay of 100 milliseconds between each flash
     setTimeout(() => flashElement($target), 0);
@@ -284,7 +261,6 @@ $(function () {
 
   // attack on click handler
   multipleChoicesWrappers.on("click", ".cta-form_checkbox", function () {
-    console.log("Clicked multiple choices");
     const $this = $(this);
     $this.addClass("is-checked");
     $this.siblings(".cta-form_checkbox").removeClass("is-checked");
