@@ -38,7 +38,7 @@ $(function () {
     direction: "vertical",
     loop: false,
     slidesPerView: 1,
-    height: window.innerHeight,
+    // height: window.innerHeight,
     allowTouchMove: false,
     observer: true,
   });
