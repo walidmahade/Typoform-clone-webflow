@@ -611,7 +611,6 @@ function getLetterFromNumber(num) {
     return alphabets[parseInt(num)];
 }
 $(function() {
-    console.log("Loading local script 2.0 -----------");
     // DOM elements
     const heroImage = $(".lv-form_hero-image");
     const goNextBtn = $(".swiper-nav.lv-form_next");
@@ -638,11 +637,9 @@ $(function() {
    * for form navigation
    * with mobile swipe support
    */ const lvFormSlider = new Swiper(".swiper", {
-        // Optional parameters
         direction: "vertical",
         loop: false,
         slidesPerView: 1,
-        height: window.innerHeight,
         allowTouchMove: false,
         observer: true
     });
@@ -812,7 +809,6 @@ $(function() {
     }
     // attack on click handler
     multipleChoicesWrappers.on("click", ".cta-form_checkbox", function() {
-        console.log("Clicked multiple choices");
         const $this = $(this);
         $this.addClass("is-checked");
         $this.siblings(".cta-form_checkbox").removeClass("is-checked");
